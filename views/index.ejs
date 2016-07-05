@@ -9,6 +9,7 @@
 
   <script src="/bower_components/angular/angular.js"></script>
   <script src="/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+  <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
 
   <script src="/js/module.js"></script>
   <script src="/js/controllers.js"></script>
@@ -20,8 +21,11 @@
     <h1><%= title %></h1>
 
     <button class="btn" ui-sref='home'>Home</button>
-    <button class="btn" ui-sref='login'>Login</button>
-    <button class="btn" ui-sref='register'>Register</button>
+    <button ng-hide='currentUser' class="btn" ui-sref='login'>Login</button>
+    <button ng-hide='currentUser' class="btn" ui-sref='register'>Register</button>    
+    <button ng-show='currentUser' class="btn" ng-click='logout()'>Logout</button>
+
+    <span ng-show='currentUser'>Hello, {{currentUser.username}}!</span>
 
     <div ui-view></div>
     

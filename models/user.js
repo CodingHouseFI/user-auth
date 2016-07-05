@@ -1,9 +1,10 @@
 'use strict';
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET;
+const bcrypt = require('bcryptjs');
 
 let userSchema = new mongoose.Schema({
   username: { type: String, required: true },
@@ -34,8 +35,9 @@ userSchema.statics.authMiddleware = function(req, res, next) {
 
 userSchema.methods.generateToken = function() {
   let payload = {
-    _id: this._id
-  }
+    _id: this._id,
+    username: this.username
+  };
 
   let token = jwt.sign(payload, JWT_SECRET, {expiresIn: '1 day'});
   return token;
@@ -49,8 +51,14 @@ userSchema.statics.register = function(userObj, cb) {
   this.findOne({username: userObj.username}, (err, user) => {
     if(err || user) return cb(err || {error: 'Username already taken.'});
 
-    this.create(userObj, err => {
-      cb(err);
+    bcrypt.hash(userObj.password, 12, (err, hash) => {
+      if(err) return cb(err);
+
+      userObj.password = hash;
+
+      this.create(userObj, err => {
+        cb(err);
+      });
     });
   });
 };
@@ -64,13 +72,17 @@ userSchema.statics.authenticate = function(userObj, cb) {
   this.findOne({username: userObj.username}, (err, user) => {
     if(err) return cb(err);
 
-    if(!user || user.password !== userObj.password) {
+    if(!user) {
       return cb({error: 'Invalid username or password.'});
     }
+    //           ( password attempt,   db hash )
+    bcrypt.compare(userObj.password, user.password, (err, isGood) => {
+      if(err || !isGood) return cb(err || {error: 'Invalid username or password.'});
 
-    let token = user.generateToken();
+      let token = user.generateToken();
 
-    cb(null, token);
+      cb(null, token);
+    });
   });
 };
 

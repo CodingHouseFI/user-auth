@@ -43,4 +43,11 @@ router.post('/logout', (req, res) => {
   res.clearCookie('authtoken').send();
 });
 
+router.delete('/:id', (req, res) => {
+  User.findByIdAndRemove(req.params.id, err => {
+    res.status(err ? 400 : 200).send(err);
+  });
+});
+
+
 module.exports = router;
