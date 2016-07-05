@@ -15,15 +15,36 @@ app.config(function($stateProvider, $urlRouterProvider) {
     
     .state('login', {
       url: '/login',
-      templateUrl: '/html/login.html',
-      controller: 'loginCtrl'
+      templateUrl: '/html/loginregister.html',
+      controller: 'loginRegisterCtrl'
     })
     .state('register', {
       url: '/register',
-      templateUrl: '/html/register.html',
-      controller: 'registerCtrl'
+      templateUrl: '/html/loginregister.html',
+      controller: 'loginRegisterCtrl'
     })
 
+    .state('profile', {
+      url: '/profile',
+      templateUrl: '/html/profile.html',
+      controller: 'profileCtrl',
+      resolve: {
+        CurrentUser: function(User) {
+          return User.getProfile();
+        }
+      }
+    })
+
+    // .state('clog', {
+    //   url: '/clog/:clogId',
+    //   templateUrl: '/html/clog.html',
+    //   controller: 'profileCtrl',
+    //   resolve: {
+    //     ThisClog: function($stateParams, Clog) {
+    //       return Clog.findById($stateParams.clogId);
+    //     }
+    //   }
+    // })
 
   $urlRouterProvider.otherwise('/');
 });

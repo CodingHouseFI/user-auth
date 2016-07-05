@@ -3,7 +3,11 @@
 var app = angular.module('myApp');
 
 
-app.service('User', function($http, $rootScope, $cookies, $state, TOKENNAME) {
+app.service('User', function($http, $rootScope, $cookies, $state, $q, TOKENNAME) {
+
+  this.getProfile = () => {
+    return $http.get('/api/users/profile');
+  };
 
   this.readToken = () => {
     let token = $cookies.get(TOKENNAME);
@@ -19,17 +23,17 @@ app.service('User', function($http, $rootScope, $cookies, $state, TOKENNAME) {
   };
 
   this.login = userObj => {
-    return $http.post('/api/users/login', userObj);
+    return $http.post('/api/users/login', userObj)  
+      .then(res => {
+        $rootScope.currentUser = res.data;
+        return $q.resolve(res);
+      });
   };
 
   this.logout = () => {
     $cookies.remove(TOKENNAME);
     $rootScope.currentUser = null;
     $state.go('home');
-
-    // 1. get rid of cookie
-    // 2. clear user from rootScope
-    // 3. (optional) send user to home state
   };
 
 });

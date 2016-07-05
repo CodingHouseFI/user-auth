@@ -32,10 +32,13 @@ router.post('/register', (req, res) => {
 router.post('/login', (req, res) => {
   // Authenticate a returning user
 
-  User.authenticate(req.body, (err, token) => {
+  User.authenticate(req.body, (err, user) => {
+    console.log('err:', err);
     if(err) return res.status(400).send(err);
 
-    res.cookie('authtoken', token).send();
+    let token = user.generateToken();
+
+    res.cookie('authtoken', token).send(user);
   });
 });
 

@@ -21,6 +21,8 @@
     <h1><%= title %></h1>
 
     <button class="btn" ui-sref='home'>Home</button>
+    <button ng-show='currentUser' class="btn" ui-sref='profile'>Profile</button>    
+    
     <button ng-hide='currentUser' class="btn" ui-sref='login'>Login</button>
     <button ng-hide='currentUser' class="btn" ui-sref='register'>Register</button>    
     <button ng-show='currentUser' class="btn" ng-click='logout()'>Logout</button>

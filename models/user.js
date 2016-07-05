@@ -69,21 +69,22 @@ userSchema.statics.authenticate = function(userObj, cb) {
   // check if username and password match
   // set login state
 
-  this.findOne({username: userObj.username}, (err, user) => {
-    if(err) return cb(err);
+  this.findOne({username: userObj.username})
+    .exec((err, user) => {
+      if(err) return cb(err);
 
-    if(!user) {
-      return cb({error: 'Invalid username or password.'});
-    }
-    //           ( password attempt,   db hash )
-    bcrypt.compare(userObj.password, user.password, (err, isGood) => {
-      if(err || !isGood) return cb(err || {error: 'Invalid username or password.'});
+      if(!user) {
+        return cb({error: 'Invalid username or password.'});
+      }
+      //           ( password attempt,   db hash )
+      bcrypt.compare(userObj.password, user.password, (err, isGood) => {
+        if(err || !isGood) return cb(err || {error: 'Invalid username or password.'});
 
-      let token = user.generateToken();
+        user.password = null;
 
-      cb(null, token);
+        cb(null, user);
+      });
     });
-  });
 };
 
 var User = mongoose.model('User', userSchema);
